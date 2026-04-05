@@ -98,3 +98,73 @@ def test_list_announcements_returns_list(mock_classroom_service):
     result = list_announcements(mock_classroom_service, course_id="123")
     assert len(result) == 1
     assert result[0]["text"] == "No hay clase el lunes"
+
+
+# ── Submissions ───────────────────────────────────────────────────────────────
+
+from src.classroom import (
+    list_my_submissions,
+    get_my_submission,
+    add_drive_attachment,
+    add_link_attachment,
+    remove_attachment,
+    turn_in_submission,
+    reclaim_submission,
+)
+
+
+def test_list_my_submissions_returns_list(mock_classroom_service):
+    mock_classroom_service.courses().courseWork().studentSubmissions().list().execute.return_value = {
+        "studentSubmissions": [
+            {"id": "sub1", "state": "TURNED_IN", "assignedGrade": 9.5},
+            {"id": "sub2", "state": "NEW"},
+        ]
+    }
+    result = list_my_submissions(mock_classroom_service, course_id="123", coursework_id="cw1")
+    assert len(result) == 2
+    assert result[0]["state"] == "TURNED_IN"
+
+
+def test_get_my_submission_returns_detail(mock_classroom_service):
+    mock_classroom_service.courses().courseWork().studentSubmissions().get().execute.return_value = {
+        "id": "sub1", "assignedGrade": 9.5, "state": "RETURNED"
+    }
+    result = get_my_submission(mock_classroom_service, course_id="123", coursework_id="cw1", submission_id="sub1")
+    assert result["assignedGrade"] == 9.5
+
+
+def test_add_drive_attachment_calls_modify(mock_classroom_service):
+    mock_classroom_service.courses().courseWork().studentSubmissions().modifyAttachments.return_value.execute.return_value = {}
+    add_drive_attachment(
+        mock_classroom_service,
+        course_id="123",
+        coursework_id="cw1",
+        submission_id="sub1",
+        drive_file_id="file123",
+    )
+    mock_classroom_service.courses().courseWork().studentSubmissions().modifyAttachments.assert_called()
+
+
+def test_add_link_attachment_calls_modify(mock_classroom_service):
+    mock_classroom_service.courses().courseWork().studentSubmissions().modifyAttachments.return_value.execute.return_value = {}
+    add_link_attachment(
+        mock_classroom_service,
+        course_id="123",
+        coursework_id="cw1",
+        submission_id="sub1",
+        url="https://example.com",
+        title="Mi referencia",
+    )
+    mock_classroom_service.courses().courseWork().studentSubmissions().modifyAttachments.assert_called()
+
+
+def test_turn_in_submission_calls_turnIn(mock_classroom_service):
+    mock_classroom_service.courses().courseWork().studentSubmissions().turnIn.return_value.execute.return_value = {}
+    turn_in_submission(mock_classroom_service, course_id="123", coursework_id="cw1", submission_id="sub1")
+    mock_classroom_service.courses().courseWork().studentSubmissions().turnIn.assert_called()
+
+
+def test_reclaim_submission_calls_reclaim(mock_classroom_service):
+    mock_classroom_service.courses().courseWork().studentSubmissions().reclaim.return_value.execute.return_value = {}
+    reclaim_submission(mock_classroom_service, course_id="123", coursework_id="cw1", submission_id="sub1")
+    mock_classroom_service.courses().courseWork().studentSubmissions().reclaim.assert_called()
