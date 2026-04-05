@@ -15,3 +15,19 @@ def list_students(service, course_id: str) -> list[dict]:
 def list_teachers(service, course_id: str) -> list[dict]:
     result = service.courses().teachers().list(courseId=course_id).execute()
     return result.get("teachers", [])
+
+
+def list_coursework(service, course_id: str) -> list[dict]:
+    result = service.courses().courseWork().list(courseId=course_id).execute()
+    return result.get("courseWork", [])
+
+
+def get_coursework(service, course_id: str, coursework_id: str) -> dict:
+    return service.courses().courseWork().get(
+        courseId=course_id, id=coursework_id
+    ).execute()
+
+
+def list_announcements(service, course_id: str) -> list[dict]:
+    result = service.courses().announcements().list(courseId=course_id).execute()
+    return result.get("announcements", [])
