@@ -3,6 +3,8 @@ __pycache__/
 *.pyo
 .env
 token.json
+client_secret_*.json
 *.egg-info/
 dist/
 .pytest_cache/
+docs/superpowers/

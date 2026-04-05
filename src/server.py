@@ -1,3 +1,7 @@
+import sys
+import os
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
 from mcp.server.fastmcp import FastMCP
 from googleapiclient.discovery import build
 from src.auth import get_credentials
@@ -56,6 +60,12 @@ def list_my_submissions(course_id: str, coursework_id: str) -> list[dict]:
 def get_my_submission(course_id: str, coursework_id: str, submission_id: str) -> dict:
     """Get full details of one of your submissions including assigned grade."""
     return classroom.get_my_submission(_classroom_service(), course_id, coursework_id, submission_id)
+
+
+@mcp.tool()
+def list_submission_attachments(course_id: str, coursework_id: str, submission_id: str) -> list[dict]:
+    """List titles and IDs of files already attached to a submission (drive files and links)."""
+    return classroom.list_submission_attachments(_classroom_service(), course_id, coursework_id, submission_id)
 
 
 @mcp.tool()
